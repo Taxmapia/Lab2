@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
-
+//Definiciones
 #define TRUE 1
 #define FALSE 0
 #define INF 100000000000
@@ -11,9 +11,8 @@
 typedef int BOOL;
 
 BOOL *Marcado = NULL;
-int **Grafo = NULL;
-
-
+int **Matriz_costos = NULL;
+//funciones muy utiles
 int *DaMemoriaArreglo(int n)
 {
     int *aux, i;
@@ -43,10 +42,10 @@ int **DaMemoriaMatriz(int m, int n)
     }
     return aux;
 }
-void LecturaDeArchivo(char arch[50])
+void LecturaDeArchivo(char arch[20])
 {
 	FILE *arch;
-	int nodos,aristas,ni,nf,i,j;
+	int nodos,aristas,ni,nf,i,m,n;
 
 	arch = fopen(arch,"r");
 	if (arch != NULL)
@@ -54,21 +53,28 @@ void LecturaDeArchivo(char arch[50])
 		fscanf(arch,"%d",&nodos);
 		fscanf(arch,"%d",&aristas);
 		printf("El grafo tiene %d nodos y %d aristas.\n",nodos,aristas);
-		Grafo = DaMemoriaMatriz(nodos,nodos)
+		Matriz_costos = DaMemoriaMatriz(nodos,nodos)
 		fscanf(arch,"%d",&ni);
 		fscanf(arch,"%d",&nf);
-		while(arch != EOF)
-		{
-			fscanf(arch,"%d",&i);
-			fscanf(arch,"%d",&j);
-			fscanf(arch,"%d",&Grafo[i][j]);
-		}
-		Marcado = DaMemoriaArreglo(nodos);
+    for (i = 0; i < aristas; i++)
+    {
+      fscanf(arch,"%d",&m);
+			fscanf(arch,"%d",&n);
+			fscanf(arch,"%d",&Grafo[m][n]);
+    }
+    Marcado = DaMemoriaArreglo(nodos);
 		fclose(arch);
-	}	
+    // imprimr matriz de costo
+    for (m = 0; m < nodos; m++)
+    {
+      for (n = 0; n < nodos; n++)
+      {
+        printf("%3d\n",Matriz_costos[m][n]);
+      }
+    }
+	}
 }
-void int main(int argc, char const *argv[])
+void main(int argc, char const *argv[])
 {
 	LecturaDeArchivo(argv[1]);
-	return 0;
 }
