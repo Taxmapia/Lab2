@@ -42,25 +42,25 @@ int **DaMemoriaMatriz(int m, int n)
     }
     return aux;
 }
-void LecturaDeArchivo(char arch[20])
+void LecturaDeArchivo(char archivo[20])
 {
 	FILE *arch;
 	int nodos,aristas,ni,nf,i,m,n;
 
-	arch = fopen(arch,"r");
+	arch = fopen(archivo,"r");
 	if (arch != NULL)
 	{
 		fscanf(arch,"%d",&nodos);
 		fscanf(arch,"%d",&aristas);
 		printf("El grafo tiene %d nodos y %d aristas.\n",nodos,aristas);
-		Matriz_costos = DaMemoriaMatriz(nodos,nodos)
+		Matriz_costos = DaMemoriaMatriz(nodos,nodos);
 		fscanf(arch,"%d",&ni);
 		fscanf(arch,"%d",&nf);
     for (i = 0; i < aristas; i++)
     {
       fscanf(arch,"%d",&m);
 			fscanf(arch,"%d",&n);
-			fscanf(arch,"%d",&Grafo[m][n]);
+			fscanf(arch,"%d",&Matriz_costos[m][n]);
     }
     Marcado = DaMemoriaArreglo(nodos);
 		fclose(arch);
@@ -69,12 +69,13 @@ void LecturaDeArchivo(char arch[20])
     {
       for (n = 0; n < nodos; n++)
       {
-        printf("%3d\n",Matriz_costos[m][n]);
+        printf("%3d",Matriz_costos[m][n]);
       }
+      printf("\n");
     }
 	}
 }
-void main(int argc, char const *argv[])
+void main(int argc, char *argv[])
 {
 	LecturaDeArchivo(argv[1]);
 }

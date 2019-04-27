@@ -4,4 +4,4 @@ all: grafo
 	g++ -std=gnu++11 $< -o $@
 
 %: %.c
-gcc $< -o $@ -lm
+	gcc $< -o $@ -lm
