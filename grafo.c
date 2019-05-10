@@ -11,71 +11,80 @@
 typedef int BOOL;
 
 BOOL *Marcado = NULL;
-int **Matriz_costos = NULL;
+int nodos;
+int aristas;
+int ni;
+int nf;
+int **Matriz=NULL;
 //funciones muy utiles
-int *DaMemoriaArreglo(int n)
+void Lectura_Archivo()
 {
-    int *aux, i;
+    FILE *arch;
+    char archivo[100];
+    int var = 0, m, n, i, j, costo;
 
-    aux = (int *)malloc(n*sizeof(int));
-    for(i=0;i<n;i++)
+    while(condicion == 0)
     {
-        aux[i] = FALSE;
-    }
-    return aux;
-}
-int **DaMemoriaMatriz(int m, int n)
-{
-    int **aux, i, j;
+        printf("Instancia: ");
+        scanf("%s", archivo);
+        arch = fopen(archivo,"r");
 
-    aux = (int **)malloc(m*sizeof(int *));
-    for(i=0;i<m;i++)
-    {
-        aux[i] = (int *)malloc(n*sizeof(int));
-    }
-    for(i=0;i<m;i++)
-    {
-        for(j=0;j<n;j++)
+        if(archivo!=NULL)
         {
-            aux[i][j] = 0;
-        }
-    }
-    return aux;
-}
-void LecturaDeArchivo(char archivo[20])
-{
-	FILE *arch;
-	int nodos,aristas,ni,nf,i,m,n;
+            fscanf(arch, "%d", &nodos);
+            fscanf(arch, "%d", &aristas);
+            fscanf(arch, "%d", &ni);
+            fscanf(arch, "%d", &nf);
 
-	arch = fopen(archivo,"r");
-	if (arch != NULL)
-	{
-		fscanf(arch,"%d",&nodos);
-		fscanf(arch,"%d",&aristas);
-		printf("El grafo tiene %d nodos y %d aristas.\n",nodos,aristas);
-		Matriz_costos = DaMemoriaMatriz(nodos,nodos);
-		fscanf(arch,"%d",&ni);
-		fscanf(arch,"%d",&nf);
-    for (i = 0; i < aristas; i++)
-    {
-      fscanf(arch,"%d",&m);
-			fscanf(arch,"%d",&n);
-			fscanf(arch,"%d",&Matriz_costos[m][n]);
+            //En esta parte se le asigna un espacio de memoria a la matriz dinamica
+            Matriz = (int **)malloc(nodos*sizeof(int));
+            for(n=0; n<nodos; n++)
+            {
+                Matriz[n] = (int *) malloc(nodos*sizeof(int));
+            }
+            if(Matriz == NULL)
+            {
+                printf("NO hay suficiente espacio en memoria\n\n");
+                var++;
+            }
+
+            //Aca se rellena la matriz con 0 para que no sea una matriz NULL
+            for(n=0;n<nodos;n++)
+            {
+                for(m=0;m<nodos;m++)
+                    Matriz[n][m]=0;
+            }
+
+            //Se carga la matriz con los datos del archivo que se va a leer
+            for(n=0;n<aristas; n++)
+            {
+                fscanf(arch, "%d", &i);
+                fscanf(arch, "%d", &j);
+                fscanf(arch, "%d", &var);
+                Matriz[i][j] = var;
+            }
+            fclose(archivo);
+        }
+        else
+        {
+            printf("ERROR: <Archivo fallido o no encontrado.>\n\n");
+            var++;
+        }
+        var++;
     }
-    Marcado = DaMemoriaArreglo(nodos);
-		fclose(arch);
-    // imprimr matriz de costo
-    for (m = 0; m < nodos; m++)
-    {
-      for (n = 0; n < nodos; n++)
-      {
-        printf("%3d",Matriz_costos[m][n]);
-      }
-      printf("\n");
-    }
-	}
+
+   //Se imprime la matriz para darle una idea al usuario
+   printf("\n");
+   for(m=0; m<nodos; m++)
+   {
+       for(n=0; n<nodos; n++)
+       {
+          printf("%2d", Matriz[m][n]);
+       }
+       printf("\n");
+   }
 }
-void main(int argc, char *argv[])
+void main()
 {
-	LecturaDeArchivo(argv[1]);
+	LecturaDeArchivo();
 }
