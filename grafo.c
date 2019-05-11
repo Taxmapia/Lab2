@@ -6,7 +6,7 @@
 //Definiciones
 #define TRUE 1
 #define FALSE 0
-#define INF 100000000000
+#define INF 1000000000
 
 typedef int BOOL;
 
@@ -47,7 +47,8 @@ int NodoCostoMinimoSinVisitar(int *Visitado, int *Costo, int nodos)
     int i, nodo, minimo;
 
     i = 0;
-    while (Visitado[i]){
+    while (Visitado[i])
+    {
         i++;
     }
 
@@ -69,6 +70,12 @@ int NodoCostoMinimoSinVisitar(int *Visitado, int *Costo, int nodos)
     }
     return nodo;
 }
+void InicializaVisitados()
+{
+    int i;
+    for(i=0;i<n_nodos;i++)
+        Visitado[i] = FALSE;
+}
 //Lectura de archivo
 void Lectura_Archivo()
 {
@@ -76,7 +83,8 @@ void Lectura_Archivo()
     char archivo[100];
     int var = 0, m, n, i, j, costo;
 
-    while(condicion == 0)
+    //Se condiciona una variable para que decida como ejeutar la Lectura_Archivo
+    while(var == 0)
     {
         printf("Instancia: ");
         scanf("%s", archivo);
@@ -115,8 +123,8 @@ void Lectura_Archivo()
           {
             fscanf(arch, "%d", &i);
             fscanf(arch, "%d", &j);
-            fscanf(arch, "%d", &var);
-            Matriz[i][j] = var;
+            fscanf(arch, "%d", &Costo);
+            Matriz[i][j] = costo;
           }
           Visitado = DaMemoriaArreglo(nodos);
           fclose(archivo);
