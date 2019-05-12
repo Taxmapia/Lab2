@@ -32,7 +32,8 @@ void InicializaVisitados()
     for(i=0;i<n_nodos;i++)
         Visitado[i] = FALSE;
 }
-void ImprimeCaminos(int **Grafo, int *NodoAnterior, int *Costo, int n, int v0)
+
+void ImprimeCamino(int **Grafo, int *NodoAnterior, int *Costo, int n, int v0)
 {
     int *Camino, i, j, nodo;
 
@@ -127,6 +128,7 @@ void DIJKSTRA(int **Grafo, int n, int v0)
     Costo = DaMemoriaArreglo(n);
     NodoAnterior = DaMemoriaArreglo(n);
 
+
     Visitado[v0] = TRUE;
     for(i=0;i<n;i++)
     {
@@ -158,21 +160,25 @@ void DIJKSTRA(int **Grafo, int n, int v0)
         costo_min = Costo[nodo_final];
         c++;
     }
-
-    if(c!=1&&costo_min==Costo[nodo_final])
+    if(costo_min!=inf)
     {
-        if(costo_min == Costo[nodo_final])
+        if((c!=1)&&(costo_min==Costo[nodo_final]))
         {
-            Grafo[NodoAnterior[nodo_final]][nodo_final] = 0;
-            DIJKSTRA(Grafo, n, v0);
+            if(costo_min == Costo[nodo_final])
+            {
+                Grafo[NodoAnterior[nodo_final]][nodo_final] = 0;
+                DIJKSTRA(Grafo, n, v0);
+            }
+        }
+        else
+        {
+            ImprimeCamino(Grafo, NodoAnterior, Costo, n, v0);
         }
     }
     else
-    {
-        ImprimeCaminos(Grafo, NodoAnterior, Costo, n, v0);
-    }
-}
+        exit(-1);
 
+}
 
 void Lectura_Archivo()
 {
@@ -230,18 +236,6 @@ void Lectura_Archivo()
         condicion++;
     }
     DIJKSTRA(Matriz, n_nodos, nodo_inicial);
-
-    /*
-    printf("\n");
-    for(m=0; m<n_nodos; m++)
-    {
-        for(n=0; n<n_nodos; n++)
-        {
-            printf("%4d", Matriz[m][n]);
-        }
-        printf("\n");
-    }/*
-
 }
 
 int main()
