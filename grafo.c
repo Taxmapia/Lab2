@@ -1,48 +1,170 @@
+//librerias
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
 #include <math.h>
-#include <stdbool.h>
-//Definiciones
+
+//definiciones
 #define TRUE 1
 #define FALSE 0
-#define INF 1000000000
+#define INF 10000000
 
+//variables locales
 typedef int BOOL;
-
+int **Grafo = NULL;
 BOOL *Visitado = NULL;
 int nodos;
-int aristas;
-int v0;
-int vf;
-int **Matriz=NULL;
+int r
+int v0,vf
+int t = 1;
+int cm; //costo minimo
 
-//funciones muy útiles
-int *DaMemoriaArreglo(int nodos)
+//asignacion de espacio en la memoria para la matriz dinamica
+int **DaMemoriaMatriz(int m, int n)
 {
-  int *aux, i;
+    int **aux, i, j;
 
-  aux = (int *)malloc(n*sizeof(int));
-  for(i=0;i<n;i++)
-  {
-      aux[i] = FALSE;
-  }
-  return aux;
-}
-int NodosSinVisitar(int *Visitado, int nodos)
-{
-  int i, cont = 0;
-
-  for (i = 0; i < n; i++)
-  {
-    if (!Visitado[i])
+    aux = (int **)malloc(m*sizeof(int *));
+    for(i=0;i<m;i++)
     {
-      cont++;
+      aux[i] = (int *)malloc(n*sizeof(int));
     }
-  }
-  return cont;
+    for(i=0;i<m;i++)
+    {
+      for(j=0;j<n;j++)
+      {
+        aux[i][j] = 0;
+      }
+    }
+    return aux;
 }
-int NodoCostoMinimoSinVisitar(int *Visitado, int *Costo, int nodos)
+
+//crea un arreglo de largo n con ceros
+int *DaMemoriaArreglo(int n)
+{
+    int *aux, i;
+
+    aux = (int *)malloc(n*sizeof(int));
+    for(i=0;i<n;i++)
+        aux[i] = FALSE;
+    return aux;
+}
+
+//lectura de archivo
+void leer_archivo()
+{
+    FILE *arch;
+    char archivo[45];
+    int aristas,costo;
+    int i, j;
+    int a = 0;
+
+    printf("Ingrese nombre del archivo: ");
+
+    while (a == 0)
+    {
+        scanf("%s",archivo);
+
+        arch = fopen(archivo,"r");
+        if (arch == NULL)
+        {
+            printf("\nError al abrir el archivo texto\n");
+            printf("\nIngrese nombre del archivo: ");
+        }
+        else
+        {
+            a++;
+        }
+    }
+    fscanf(arch,"%d", &nodos);
+    fscanf(arch,"%d", &aristas);
+    fscanf(arch,"%d",&v0);
+    fscanf(arch,"%d",&vf);
+
+    Grafo = DaMemoriaMatriz(nodos,nodos);
+    for(r=0; r<aristas; r++)
+            {
+                fscanf(arch, "%d", &i);
+                fscanf(arch, "%d", &j);
+                fscanf(arch, "%d", &costo);
+                Grafo[i][j] = costo;
+            }
+
+    Visitado = DaMemoriaArreglo(nodos);
+    fclose(arch);
+}
+//inicializa los visitados en false a todos
+void InicializaVisitados()
+{
+    int i;
+    for(i=0;i<nodos;i++)
+    {
+        Visitado[i] = FALSE;
+    }
+}
+//Imprecion de camino
+void ImprimeCaminos(int *NodoAnterior, int *Costo, int nodos, int v0, int vf)
+{
+    int *Camino, i, j, n;
+
+    Camino = DaMemoriaArreglo(nodos);
+
+    for(i=0;i<nodos;i++)
+    {
+        if (i != v0)
+        {
+            j = 0;
+            Camino[j] = i;
+            j++;
+            n = NodoAnterior[i];
+            while(nodo != v0)
+            {
+                Camino[j] = nodo;
+                j++;
+                nodo = NodoAnterior[nodo];
+            }
+            Camino[j] = nodo;
+
+            if(costo[i]! = INF)
+            {
+                 if( i == vf)
+                {
+                  printf("\n%2d\n", Costo[i]);
+
+                while (j >= 0)
+                {
+                    printf("%2d", Camino[j]);
+                    j--;
+                }
+                }
+            }
+            else
+            {
+                printf("\n-1");
+            }
+
+        }
+    }
+}
+//cantidad de nodos no visitados
+int NumeroNodosSinVisitar(int *Visitado, int nodos)
+{
+    int i, cont;
+
+    i = 0;
+    cont = 0;
+
+    while (i < nodos)
+    {
+        if (!Visitado[i])
+        {
+            cont++;
+        }
+        i++;
+    }
+   return cont;
+}
+//Nodo de menor costo
+int NodoMinimoCostoSinVisitar(int *Visitado, int *Costo, int nodos)
 {
     int i, nodo, minimo;
 
@@ -56,7 +178,7 @@ int NodoCostoMinimoSinVisitar(int *Visitado, int *Costo, int nodos)
     nodo = i;
 
     i++;
-    while(i < n)
+    while(i < nodos)
     {
         if (!Visitado[i])
         {
@@ -70,133 +192,79 @@ int NodoCostoMinimoSinVisitar(int *Visitado, int *Costo, int nodos)
     }
     return nodo;
 }
-void InicializaVisitados()
+//DIJKSTRA, determiona el camino de costo minimo del grafo ingresado
+void DIJKSTRA(int **Grafo, int nodos, int v0)
 {
-    int i;
-    for(i=0;i<n_nodos;i++)
-        Visitado[i] = FALSE;
-}
-//Lectura de archivo
-void Lectura_Archivo()
-{
-    FILE *arch;
-    char archivo[100];
-    int var = 0, m, n, i, j, costo;
+    BOOL *Visitado;
+    int i, j;
+    int w = v0;
+    int *Costo;
+    int *NodoAnterior;
 
-    //Se condiciona una variable para que decida como ejeutar la Lectura_Archivo
-    while(var == 0)
+    Visitado = DaMemoriaArreglo(nodos);
+    Costo = DaMemoriaArreglo(nodos);
+    NodoAnterior = DaMemoriaArreglo(nodos);
+
+    Visitado[v0] = TRUE;
+    for(i=0;i<nodos;i++)
     {
-        printf("Instancia: ");
-        scanf("%s", archivo);
-        arch = fopen(archivo,"r");
-
-        if(archivo!=NULL)
+        if (Grafo[v0][i] == 0)
         {
-          fscanf(arch, "%d", &nodos);
-          fscanf(arch, "%d", &aristas);
-          fscanf(arch, "%d", &v0);
-          fscanf(arch, "%d", &vf);
-
-          //En esta parte se le asigna un espacio de memoria a la matriz dinamica
-          Matriz = (int **)malloc(nodos*sizeof(int));
-          for(n=0; n<nodos; n++)
-          {
-            Matriz[n] = (int *) malloc(nodos*sizeof(int));
-          }
-          if(Matriz == NULL)
-          {
-            printf("NO hay suficiente espacio en memoria\n\n");
-            var++;
-          }
-
-          //Aca se rellena la matriz con 0 para que no sea una matriz NULL
-          for(n=0;n<nodos;n++)
-          {
-            for(m=0;m<nodos;m++)
-            {
-              Matriz[n][m]=0;
-            }
-          }
-
-          //Se carga la matriz con los datos del archivo que se va a leer
-          for(n=0;n<aristas; n++)
-          {
-            fscanf(arch, "%d", &i);
-            fscanf(arch, "%d", &j);
-            fscanf(arch, "%d", &Costo);
-            Matriz[i][j] = costo;
-          }
-          Visitado = DaMemoriaArreglo(nodos);
-          fclose(archivo);
+            Valor[i] = INF;
         }
         else
         {
-          printf("ERROR: <Archivo fallido o no encontrado.>\n\n");
-          var++;
+            Valor[i] = Grafo[v0][i];
         }
-        var++;
+        NodoAnterior[i] = v0;
     }
-
-   //Se imprime la matriz para darle una idea al usuario
-   printf("\n");
-   for(m=0; m<nodos; m++)
-   {
-       for(n=0; n<nodos; n++)
-       {
-          printf("%2d", Matriz[m][n]);
-       }
-       printf("\n");
-   }
-}
-//DIJKSTRA
-void DIJKSTRA(int **Grafo, int nodos, int v0)
-{
-  //Variables y punteros
-    BOOL *Visitado;
-    int *Costo;
-    int *NodoAnterior;
-    int i, j, w=v0;
-    Visitado = DaMemoriaArreglo(n);
-    Costo = DaMemoriaArreglo(n);
-    NodoAnterior = DaMemoriaArreglo(n);
-
-    Visitado[w] = TRUE; //se marca como visitado el nodo v0
-    for(i=0;i<n;i++)
+    while (NumeroNodosSinVisitar(Visitado, nodos)>1)
     {
-      if (Grafo[v0][i] == 0) //si no estan conectados se declara como infinito
-      {
-        Costo[i] = inf;
-      }
-      else //si estan conectados se asigna el costo
-      {
-        Costo[i] = Grafo[v0][i];
-      }
-      NodoAnterior[i] = v0;
-    }
-    while (NodosSinVisitar(Visitado, n)>1)
-    {
-      w = NodoCostoMinimoSinVisitar(Visitado, Costo, n);
-      Visitado[w] = TRUE;
-      for(j=0;j<n;j++)
-      {
-        if ((Grafo[w][j] != 0) && (!Visitado[j]))
+        w = NodoMinimoCostoSinVisitar(Visitado, Costo, nodos);
+        Visitado[w] = TRUE;
+        for(j=0;j<nodos;j++)
         {
-          if (Costo[w] + Grafo[w][j] < Costo[j])
-          {
-            NodoAnterior[j] = w;
-            Costo[j] = Costo[w] + Grafo[w][j];
-          }
+            if ((Grafo[w][j] != 0) && (!Visitado[j]))
+            {
+                if (Costo[w] + Grafo[w][j] < Costo[j])
+                {
+                    NodoAnterior[j] = w;
+                    Costo[j] = Costo[w] + Grafo[w][j];
+                }
+            }
         }
-      }
     }
-    ImprimeCaminos(NodoAnterior, Costo, n, v0);
+    //desde aca calcula el camino casi mas corto y si no retorna un -1
+      if(t==1)
+    {
+        cm = Costo[v0];
+        if(cm == INF)
+        {
+            printf("\n-1\n");
+        }
+        t++;
+    }
+
+
+    if(t!=1&&cm==Valor[vf])
+    {
+        if(cm == Costo[vf])
+        {
+            Grafo[NodoAnterior[vf]][vf] = 0;
+            DIJKSTRA(Grafo, nodos, v0);
+        }
+    }
+    else
+    {
+        ImprimeCaminos(NodoAnterior, Costo, nodos, v0, vf);
+    }
 }
-void main()
+//Main :)
+int main()
 {
-	LecturaDeArchivo();
+  leer_archivo();
   InicializaVisitados();
-  printf("\n\n\tIngrese nodo inicial para buscar los caminos en el grafo (entre 0 y %d): ", n-1);
-  scanf("%d", &v0);
-  printf("\n\n\tLos caminos son: ");
-  DIJKSTRA(Matriz, n, v0);
+  DIJKSTRA(Grafo, nodos, v0);
+  printf("\n");
+  return 0;
 }
