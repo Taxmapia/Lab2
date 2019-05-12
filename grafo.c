@@ -6,16 +6,17 @@
 //definiciones
 #define TRUE 1
 #define FALSE 0
-#define INF 10000000
+#define INF 3000000
 
 //variables locales
 typedef int BOOL;
 int **Grafo = NULL;
 BOOL *Visitado = NULL;
 int nodos;
-int r
-int v0,vf
-int t = 1;
+int r;
+int v0;
+int vf;
+int t = 0;
 int cm; //costo minimo
 
 //asignacion de espacio en la memoria para la matriz dinamica
@@ -45,12 +46,14 @@ int *DaMemoriaArreglo(int n)
 
     aux = (int *)malloc(n*sizeof(int));
     for(i=0;i<n;i++)
-        aux[i] = FALSE;
+    {
+      aux[i] = FALSE;
+    }
     return aux;
 }
 
 //lectura de archivo
-void leer_archivo()
+void LecturaDeArchivo()
 {
     FILE *arch;
     char archivo[45];
@@ -104,7 +107,7 @@ void InicializaVisitados()
 //Imprecion de camino
 void ImprimeCaminos(int *NodoAnterior, int *Costo, int nodos, int v0, int vf)
 {
-    int *Camino, i, j, n;
+    int *Camino, i, j, nodo;
 
     Camino = DaMemoriaArreglo(nodos);
 
@@ -115,7 +118,7 @@ void ImprimeCaminos(int *NodoAnterior, int *Costo, int nodos, int v0, int vf)
             j = 0;
             Camino[j] = i;
             j++;
-            n = NodoAnterior[i];
+            nodo = NodoAnterior[i];
             while(nodo != v0)
             {
                 Camino[j] = nodo;
@@ -124,24 +127,24 @@ void ImprimeCaminos(int *NodoAnterior, int *Costo, int nodos, int v0, int vf)
             }
             Camino[j] = nodo;
 
-            if(costo[i]! = INF)
+            if(Costo[i] != INF)
             {
                  if( i == vf)
                 {
                   printf("\n%2d\n", Costo[i]);
 
-                while (j >= 0)
-                {
-                    printf("%2d", Camino[j]);
-                    j--;
-                }
+                  while (j >= 0)
+                  {
+                      printf("%2d", Camino[j]);
+                      j--;
+                  }
                 }
             }
             else
             {
                 printf("\n-1");
+                return;
             }
-
         }
     }
 }
@@ -210,11 +213,11 @@ void DIJKSTRA(int **Grafo, int nodos, int v0)
     {
         if (Grafo[v0][i] == 0)
         {
-            Valor[i] = INF;
+            Costo[i] = INF;
         }
         else
         {
-            Valor[i] = Grafo[v0][i];
+            Costo[i] = Grafo[v0][i];
         }
         NodoAnterior[i] = v0;
     }
@@ -235,24 +238,20 @@ void DIJKSTRA(int **Grafo, int nodos, int v0)
         }
     }
     //desde aca calcula el camino casi mas corto y si no retorna un -1
-      if(t==1)
+      if(t==0)
     {
-        cm = Costo[v0];
-        if(cm == INF)
+        cm = Costo[vf];
+        if (cm == INF)
         {
-            printf("\n-1\n");
+          printf("\n-1\n");
+          return;
         }
-        t++;
     }
-
-
-    if(t!=1&&cm==Valor[vf])
+    t++;
+    if(t!=0&&cm==Costo[vf])
     {
-        if(cm == Costo[vf])
-        {
-            Grafo[NodoAnterior[vf]][vf] = 0;
-            DIJKSTRA(Grafo, nodos, v0);
-        }
+        Grafo[NodoAnterior[vf]][vf] = 0;
+        DIJKSTRA(Grafo, nodos, v0);
     }
     else
     {
@@ -262,7 +261,7 @@ void DIJKSTRA(int **Grafo, int nodos, int v0)
 //Main :)
 int main()
 {
-  leer_archivo();
+  LecturaDeArchivo();
   InicializaVisitados();
   DIJKSTRA(Grafo, nodos, v0);
   printf("\n");
